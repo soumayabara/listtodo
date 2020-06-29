@@ -5,7 +5,21 @@ require_once './Source/Database/Connection.php';
 
 confirmLogin();
 
-
+if (isset($_POST['AddTask'])) {
+    $ID = $_GET['id'];
+    $TName = $_POST['TName'];
+    date_default_timezone_set('Africa/Casablanca');
+    $currentTime = time();
+    $dateTime = strftime("%B-%d-%Y %H:%M:%S", $currentTime);
+    if (empty($TName)) {
+        $_SESSION['ErrorMessage'] = 'Name Task Required';
+    } else {
+//        code here
+        $db = new Connection();
+        $db->addTask($TName, $dateTime, $ID);
+        
+    }
+}
 
 
 if (isset($_POST['newTDL'])) {
@@ -40,7 +54,7 @@ and open the template in the editor.
     <head>
         <meta charset="UTF-8">
         <title>ToDoList Demo</title>
-        <link rel="stylesheet" href="https://stackpath.bootstrapcdn.com/bootswatch/4.5.0/sketchy/bootstrap.min.css">
+        <link rel="stylesheet" href="https://bootswatch.com/4/united/bootstrap.min.css">
     </head>
     <body>
 
@@ -136,17 +150,83 @@ and open the template in the editor.
                     $rows = $db->getTDL();
 
                     foreach ($rows as $item) {
-                        $idtdl = $item['idtdl'];  
+                        $idtdl = $item['idtdl'];
 //                        echo $idtdl;
                         ?>
 
-                        <div class="card-body">
-                            <div class="card-header"><?php echo $item['name']; ?></div>
-                            <h4 class="card-title"><?php echo $item['color']; ?></h4>
-                            <p class="card-text"><?php echo $item['date']; ?>.</p>
-                            <h5><?php echo $item['createdby']; ?></h5>
-                            <a href="delete.php?id=<?php echo $idtdl; ?>">delete</a>
+
+                        <div class="toast show" role="alert" aria-live="assertive" aria-atomic="true">
+                            <div class="toast-header">
+                                <strong class="mr-auto"><?php echo $item['name']; ?></strong>
+                                <small><?php echo $item['date']; ?></small>
+
+                                <a href="delete.php?id=<?php echo $idtdl; ?>"> <button type="button" class="ml-2 mb-1 close" data-dismiss="toast" aria-label="Close">
+                                        <span aria-hidden="true">&times;</span>
+                                    </button></a>
+
+
+                            </div>
+                            <div class="toast-body" style="background-color:<?php echo $item['color']; ?> ">
+                                <?php echo $item['createdby']; ?>
+
+
+
+                                <!-- Content -->
+                                <!-- get list tasks-->
+
+                                <?php
+                                $db = new Connection();
+                                $row = $db->getTasks($idtdl);
+
+                                foreach ($row as $i) { ?>
+                                    <!-- get list tasks-->
+                                <div class="toast show" role="alert" aria-live="assertive" aria-atomic="true">
+                                    <div class="toast-header">
+                                        <strong class="mr-auto"><?php echo $i['name']; ?></strong>
+                                        <small><?php echo $i['date'];?></small>
+                                        <a href="deleteTask.php?id=<?php echo $i['idtask'];?>"> <button type="button" class="ml-2 mb-1 close" data-dismiss="toast" aria-label="Close">
+                                            <span aria-hidden="true">&times;</span>
+                                        </button>
+                                        </a>
+                                    </div>
+                                    <div class="toast-body">
+                                        Hello, world! This is a toast message.
+                                    </div>
+                                </div>
+
+                                <!-- end get list tasks-->
+                               <?php }
+                                ?>
+                                
+
+
+                                <!-- ADD NEW TASK-->
+                                <!-- TASKS -->
+                                <a class="btn btn-primary" data-toggle="collapse" href="#TDL<?php echo htmlentities($idtdl); ?>" role="button" aria-expanded="false" aria-controls="collapseExample">
+                                    Task +
+                                </a>
+                                <div class="collapse" id="TDL<?php echo htmlentities($idtdl); ?>">
+                                    <div class="card card-body">
+                                        <!-- Formulaire pour l'ajoute -->
+                                        <form method="post" action="Dashboard.php?id=<?php echo htmlentities($idtdl); ?>">
+                                            <div class="form-group">
+                                                <label class="col-form-label" for="TName">Task Name</label>
+                                                <input type="text" class="form-control" placeholder="Default input" id="TName" name="TName">
+                                            </div>
+                                            <button type="submit" class="btn btn-primary btn-sm" name="AddTask">+</button>
+                                        </form>
+                                    </div>
+                                </div>
+                                <!-- END TASKS -->
+
+                            </div>
                         </div>
+
+
+
+
+
+
 
                     </div>
                 <?php } ?>

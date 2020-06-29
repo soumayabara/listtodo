@@ -123,8 +123,8 @@ class Connection {
         $rows = $stmt->fetchAll(PDO::FETCH_ASSOC);
         return $rows;
     }
-    
-    public function deletetdl($Id){
+
+    public function deletetdl($Id) {
         $SQL = "DELETE FROM tdl WHERE idtdl='" . $Id . "'";
         $stmt = $this->Connection->prepare($SQL);
         $result = $stmt->execute();
@@ -136,6 +136,40 @@ class Connection {
             redirectTo("Dashboard.php");
         }
     }
+
+    public function addTask($TName, $dateTime, $ID) {
+        $sql = "INSERT INTO tasks (name, date, idtdl) "
+                . "VALUES('" . $TName . "', '" . $dateTime . "', '" . $ID . "')";
+        $stmt = $this->Connection->prepare($sql);
+        $res = $stmt->execute();
+        if ($res) {
+            $_SESSION["SuccessMessage"] = "Task with ID:" . $this->Connection->lastInsertId() . " Created Successfuly";
+            redirectTo("Dashboard.php");
+        } else {
+            $_SESSION["ErrorMessage"] = "Something Wrong";
+            redirectTo("Dashboard.php");
+        }
+    }
+
+    public function getTasks($ID) {
+        $SQL = "SELECT * FROM tasks WHERE idtdl= '" . $ID . "'";
+        $stmt = $this->Connection->prepare($SQL);
+        $stmt->execute();
+        $rows = $stmt->fetchAll(PDO::FETCH_ASSOC);
+        return $rows;
+    }
     
+     public function deletetask($Id) {
+        $SQL = "DELETE FROM tasks WHERE idtask='" . $Id . "'";
+        $stmt = $this->Connection->prepare($SQL);
+        $result = $stmt->execute();
+        if ($result) {
+            $_SESSION["SuccessMessage"] = "Task Deleted Successfully";
+            redirectTo("Dashboard.php");
+        } else {
+            $_SESSION["ErrorMessage"] = "Something Wrong When we trying to Deleted Task";
+            redirectTo("Dashboard.php");
+        }
+    }
 
 }
